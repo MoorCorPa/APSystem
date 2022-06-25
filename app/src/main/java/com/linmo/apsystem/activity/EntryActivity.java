@@ -1,5 +1,6 @@
 package com.linmo.apsystem.activity;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -38,6 +39,9 @@ import com.linmo.apsystem.utils.maxiaozhou1234.camera2.CameraUtil;
 import com.linmo.apsystem.utils.maxiaozhou1234.camera2.OnImageAvailableListener;
 import com.linmo.apsystem.view.AutoFitTextureView;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 import butterknife.BindView;
@@ -58,12 +62,12 @@ public class EntryActivity extends AppCompatActivity {
     @BindView(R.id.entry_surfaceView)
     AutoFitTextureView textureView;
 
-    private CameraUtil cameraUtil;
     private Camera2Helper helper;
     private Retrofit retrofit;
     private SharedPreferences address;
     private NetworkApi networkApi;
     private Gson gson;
+    private String base64Data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +81,7 @@ public class EntryActivity extends AppCompatActivity {
 
     private void init(){
         helper = new Camera2Helper(this, textureView);
+        helper.setImageFormat(ImageFormat.JPEG);
         address = getSharedPreferences("address", MODE_PRIVATE);
         String url = address.getString("address", "http://127.0.0.1/");
         gson = new Gson();
@@ -89,18 +94,23 @@ public class EntryActivity extends AppCompatActivity {
         networkApi = retrofit.create(NetworkApi.class);
 
         helper.setOnImageAvailableListener(new Camera2Helper.OnPreviewCallbackListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onImageAvailable(Image image) {
-                Log.d("weijw1", "helper onImageAvailable");
+                Log.d(TAG, "helper onImageAvailable");
+
+                base64Data = BaseUtils.image2base64(image);
+                System.out.println(base64Data);
             }
         });
+
 
     }
 
     @OnClick(R.id.btn_rentry)
     void rentry(){
-//        cameraUtil.capturePicture();
-//        upload();
+        cameraUtil.capturePicture();
+        upload("202206");
     }
 
     private void upload(String personId, String base64Data){

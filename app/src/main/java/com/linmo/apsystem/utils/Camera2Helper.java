@@ -16,6 +16,7 @@ import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
+import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
@@ -27,6 +28,7 @@ import android.os.HandlerThread;
 import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
+import android.view.SurfaceView;
 import android.view.TextureView;
 import android.widget.Toast;
 
@@ -436,6 +438,7 @@ public class Camera2Helper {
                             mPreviewSize.getHeight(), mPreviewSize.getWidth());
                 }
 
+                //前置摄像头
                 mCameraId = "1";
                 return;
             }
@@ -674,5 +677,11 @@ public class Camera2Helper {
     public interface OnPreviewCallbackListener {
         void onImageAvailable(Image image);
     }
+
+
+    public void capturePicture(){
+
+    }
+
 
 }
