@@ -13,7 +13,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.linmo.apsystem.activity.SignActivity;
-import com.linmo.apsystem.activity.entry.EntryActivity;
+import com.linmo.apsystem.activity.EntryActivity;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;

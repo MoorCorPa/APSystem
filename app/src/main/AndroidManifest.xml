@@ -30,7 +30,7 @@
             android:name=".activity.SignActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.entry.EntryActivity"
+            android:name=".activity.EntryActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

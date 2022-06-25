@@ -9,7 +9,7 @@ public interface NetworkApi {
 
     //训练模型照片上传
     @POST("face/upload_rq")
-    Single<Result> uploadRg(String personId, String imagePath);
+    Single<Result> uploadRg(String personId, String base64Data);
 
     //训练模型
     @POST("face/trainer_rq")
