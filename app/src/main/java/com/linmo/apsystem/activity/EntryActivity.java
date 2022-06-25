@@ -68,6 +68,7 @@ public class EntryActivity extends AppCompatActivity {
     private NetworkApi networkApi;
     private Gson gson;
     private String base64Data;
+    private Image img;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +84,7 @@ public class EntryActivity extends AppCompatActivity {
         helper = new Camera2Helper(this, textureView);
         helper.setImageFormat(ImageFormat.JPEG);
         address = getSharedPreferences("address", MODE_PRIVATE);
-        String url = address.getString("address", "http://127.0.0.1/");
+        String url = address.getString("address", "http://10.0.0.229:5001/");
         gson = new Gson();
         retrofit = new Retrofit.Builder()
                 .baseUrl(url)
@@ -98,19 +99,18 @@ public class EntryActivity extends AppCompatActivity {
             @Override
             public void onImageAvailable(Image image) {
                 Log.d(TAG, "helper onImageAvailable");
-
                 base64Data = BaseUtils.image2base64(image);
-                System.out.println(base64Data);
             }
         });
 
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @OnClick(R.id.btn_rentry)
     void rentry(){
-        cameraUtil.capturePicture();
-        upload("202206");
+        System.out.println(base64Data);
+        getPhotoRg("202206", base64Data);
     }
 
     private void upload(String personId, String base64Data){
@@ -133,7 +133,28 @@ public class EntryActivity extends AppCompatActivity {
                         Log.d(TAG, "onError: " + e.getMessage());
                     }
                 });
+    }
 
+    private void getPhotoRg(String personId, String base64Data) {
+        networkApi.getPhotoRg(personId, base64Data)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidScheduler.mainThread())
+                .subscribe(new SingleObserver<Result>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        Log.d(TAG, "onSubscribe");
+                    }
+
+                    @Override
+                    public void onSuccess(@NonNull Result result) {
+                        Log.d(TAG, "onSuccess: " + result.toString());
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        Log.d(TAG, "onError: " + e.getMessage());
+                    }
+                });
     }
 
 

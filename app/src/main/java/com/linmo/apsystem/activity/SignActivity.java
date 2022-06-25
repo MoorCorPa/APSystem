@@ -63,7 +63,6 @@ public class SignActivity extends AppCompatActivity {
         String signid = "";
         signid = et_personid.getText().toString();
         Log.d(TAG, "SignIn: "+ signid);
-        imageToBase64();    
 
 
         // 网络请求
