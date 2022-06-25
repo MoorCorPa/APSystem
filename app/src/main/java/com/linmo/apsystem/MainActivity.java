@@ -9,7 +9,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.linmo.apsystem.activity.entry.EntryActivity;
-import com.linmo.apsystem.activity.signIn.SignInActivity;
+import com.linmo.apsystem.activity.sign.SignInActivity;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;

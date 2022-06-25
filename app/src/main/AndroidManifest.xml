@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.APSystem">
         <activity
-            android:name=".SignInActivity"
+            android:name=".activity.sign.SignInActivity"
             android:exported="false" />
         <activity
             android:name=".activity.entry.EntryActivity"
