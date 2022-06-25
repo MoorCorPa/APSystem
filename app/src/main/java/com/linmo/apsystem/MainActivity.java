@@ -1,9 +1,13 @@
 package com.linmo.apsystem;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -21,6 +25,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)//判断是否获得权限
+        {  ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 100);}//获取权限
+
     }
 
     @OnClick({R.id.btn_in, R.id.btn_entry})
