@@ -3,9 +3,12 @@ package com.linmo.apsystem;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+
+import com.linmo.apsystem.activity.entry.EntryActivity;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -23,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     public void onClick(View v){
         switch (v.getId()){
             case R.id.btn_entry:
+                startActivity(new Intent(this, EntryActivity.class));
                 Log.d("entry", "onClick: entry" );
                 break;
             case R.id.btn_in:
