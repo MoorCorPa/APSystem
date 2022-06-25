@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
@@ -30,9 +31,12 @@ import com.linmo.apsystem.api.NetworkApi;
 import com.linmo.apsystem.model.Result;
 import com.linmo.apsystem.utils.AndroidScheduler;
 import com.linmo.apsystem.utils.BaseUtils;
+import com.linmo.apsystem.utils.Camera2Helper;
+import com.linmo.apsystem.utils.ToastUtils;
 import com.linmo.apsystem.utils.maxiaozhou1234.camera2.CameraConfig;
 import com.linmo.apsystem.utils.maxiaozhou1234.camera2.CameraUtil;
 import com.linmo.apsystem.utils.maxiaozhou1234.camera2.OnImageAvailableListener;
+import com.linmo.apsystem.view.AutoFitTextureView;
 
 import java.nio.ByteBuffer;
 
@@ -52,9 +56,10 @@ public class EntryActivity extends AppCompatActivity {
     private static final String TAG = "EntryActivity";
     
     @BindView(R.id.entry_surfaceView)
-    TextureView textureView;
+    AutoFitTextureView textureView;
 
     private CameraUtil cameraUtil;
+    private Camera2Helper helper;
     private Retrofit retrofit;
     private SharedPreferences address;
     private NetworkApi networkApi;
@@ -71,6 +76,7 @@ public class EntryActivity extends AppCompatActivity {
     }
 
     private void init(){
+        helper = new Camera2Helper(this, textureView);
         address = getSharedPreferences("address", MODE_PRIVATE);
         String url = address.getString("address", "http://127.0.0.1/");
         gson = new Gson();
@@ -81,6 +87,20 @@ public class EntryActivity extends AppCompatActivity {
                 .build();
 
         networkApi = retrofit.create(NetworkApi.class);
+
+        helper.setOnImageAvailableListener(new Camera2Helper.OnPreviewCallbackListener() {
+            @Override
+            public void onImageAvailable(Image image) {
+                Log.d("weijw1", "helper onImageAvailable");
+            }
+        });
+
+    }
+
+    @OnClick(R.id.btn_rentry)
+    void rentry(){
+//        cameraUtil.capturePicture();
+//        upload();
     }
 
     private void upload(String personId, String base64Data){
@@ -106,32 +126,28 @@ public class EntryActivity extends AppCompatActivity {
 
     }
 
-// 有bug 弃用
-//    private void initCamera(){
-//        cameraUtil = new CameraUtil(this, textureView, null);
-//        cameraUtil.setPreviewImageFormat(ImageFormat.DEPTH16);
-//        cameraUtil.setDefaultCamera(false);
-//        cameraUtil.setAutoFixSurface(true);
-//    }
-//
-//    @OnClick(R.id.btn_rentry)
-//    void rentry(){
-//        cameraUtil.capturePicture();
-//    }
-//
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        //启动预览
-//        cameraUtil.startPreview(this);
-//    }
-//    //在 onPause 或者 onDestroy 中释放资源
-//    //建议在 onPause 中，因为 onDestroy 中系统已先断开与相机的连接
-//    @Override
-//    protected void onPause() {
-//        if (cameraUtil != null) {
-//            cameraUtil.release();
-//        }
-//        super.onPause();
-//    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        helper.open();  //会动态请求权限，请重写 onRequestPermissionsResult
+    }
+
+    @Override
+    public void onPause() {
+        helper.closeCamera();
+        super.onPause();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        if (requestCode == helper.getCameraRequestCode()) {
+            if (grantResults.length != 1 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                ToastUtils.show(this,  "我号了");
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
 }

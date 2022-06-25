@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".activity.EntryActivity">
 
-    <TextureView
+    <com.linmo.apsystem.view.AutoFitTextureView
         android:id="@+id/entry_surfaceView"
         android:layout_width="200dp"
         android:layout_height="200dp"
