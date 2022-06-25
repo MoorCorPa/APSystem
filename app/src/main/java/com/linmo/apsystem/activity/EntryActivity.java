@@ -67,7 +67,7 @@ public class EntryActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         init();
-        initCamera();
+//        initCamera();
     }
 
     private void init(){
@@ -90,7 +90,7 @@ public class EntryActivity extends AppCompatActivity {
                 .subscribe(new SingleObserver<Result>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
-
+                        Log.d(TAG, "onSubscribe");
                     }
 
                     @Override
@@ -100,7 +100,7 @@ public class EntryActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-
+                        Log.d(TAG, "onError: " + e.getMessage());
                     }
                 });
 
