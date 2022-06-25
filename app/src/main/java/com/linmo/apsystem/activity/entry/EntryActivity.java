@@ -48,27 +48,34 @@ public class EntryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_entry);
         ButterKnife.bind(this);
 
-        initCamera();
     }
 
-    private void initCamera(){
-        cameraUtil = new CameraUtil(this, textureView, null);
-        cameraUtil.setDefaultCamera(false);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        //启动预览
-        cameraUtil.startPreview(this);
-    }
-    //在 onPause 或者 onDestroy 中释放资源
-    //建议在 onPause 中，因为 onDestroy 中系统已先断开与相机的连接
-    @Override
-    protected void onPause() {
-        if (cameraUtil != null) {
-            cameraUtil.release();
-        }
-        super.onPause();
-    }
+// 有bug 弃用
+//    private void initCamera(){
+//        cameraUtil = new CameraUtil(this, textureView, null);
+//        cameraUtil.setPreviewImageFormat(ImageFormat.DEPTH16);
+//        cameraUtil.setDefaultCamera(false);
+//        cameraUtil.setAutoFixSurface(true);
+//    }
+//
+//    @OnClick(R.id.btn_rentry)
+//    void rentry(){
+//        cameraUtil.capturePicture();
+//    }
+//
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        //启动预览
+//        cameraUtil.startPreview(this);
+//    }
+//    //在 onPause 或者 onDestroy 中释放资源
+//    //建议在 onPause 中，因为 onDestroy 中系统已先断开与相机的连接
+//    @Override
+//    protected void onPause() {
+//        if (cameraUtil != null) {
+//            cameraUtil.release();
+//        }
+//        super.onPause();
+//    }
 }
