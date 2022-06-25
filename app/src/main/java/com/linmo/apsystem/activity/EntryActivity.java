@@ -123,7 +123,6 @@ public class EntryActivity extends AppCompatActivity {
                         Log.d(TAG, "onError: " + e.getMessage());
                     }
                 });
-
     }
 
 
