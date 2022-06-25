@@ -34,6 +34,7 @@ import java.nio.ByteBuffer;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import retrofit2.Retrofit;
 
 public class EntryActivity extends AppCompatActivity {
 
@@ -41,6 +42,7 @@ public class EntryActivity extends AppCompatActivity {
     TextureView textureView;
 
     private CameraUtil cameraUtil;
+    private Retrofit retrofit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,11 @@ public class EntryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_entry);
         ButterKnife.bind(this);
 
+    }
+
+    public void init(){
+        retrofit = new Retrofit.Builder()
+                .build()
     }
 
 // 有bug 弃用
