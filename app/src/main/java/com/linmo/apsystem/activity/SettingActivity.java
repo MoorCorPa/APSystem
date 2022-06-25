@@ -25,7 +25,7 @@ public class SettingActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.btn_savesetting)
-    private void save(){
+    void save(){
         SharedPreferences preferences = getSharedPreferences("address", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("address", "http://"+address.getText().toString()+"/");

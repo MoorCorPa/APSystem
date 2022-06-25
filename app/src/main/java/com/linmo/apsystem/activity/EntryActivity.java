@@ -19,6 +19,7 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.SurfaceView;
 import android.view.TextureView;
 import android.widget.Toast;
@@ -48,7 +49,7 @@ import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class EntryActivity extends AppCompatActivity {
-    private static final int TAG = 57;
+    private static final String TAG = "EntryActivity";
     
     @BindView(R.id.entry_surfaceView)
     TextureView textureView;
@@ -66,6 +67,7 @@ public class EntryActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         init();
+        initCamera();
     }
 
     private void init(){
@@ -93,7 +95,7 @@ public class EntryActivity extends AppCompatActivity {
 
                     @Override
                     public void onSuccess(@NonNull Result result) {
-                        
+                        Log.d(TAG, "onSuccess: " + result.toString());
                     }
 
                     @Override
