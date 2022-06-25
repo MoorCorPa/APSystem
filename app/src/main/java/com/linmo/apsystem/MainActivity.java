@@ -8,8 +8,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import com.linmo.apsystem.activity.SignActivity;
 import com.linmo.apsystem.activity.entry.EntryActivity;
-import com.linmo.apsystem.activity.sign.SignInActivity;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("entry", "onClick: entry" );
                 break;
             case R.id.btn_in:
-                startActivity(new Intent(this, SignInActivity.class));
+                startActivity(new Intent(this, SignActivity.class));
                 Log.d("signIn", "onClick: signIn");
                 break;
         }
