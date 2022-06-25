@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.gson.Gson;
 import com.linmo.apsystem.R;
 import com.linmo.apsystem.api.NetworkApi;
+import com.linmo.apsystem.model.RequestBody;
 import com.linmo.apsystem.model.Result;
 import com.linmo.apsystem.utils.AndroidScheduler;
 import com.linmo.apsystem.utils.BaseUtils;
@@ -76,8 +77,8 @@ public class SignActivity extends AppCompatActivity {
     }
 
     // 网络请求
-    private void getPhotoRg(String personId, String base64Data) {
-        networkApi.getPhotoRg(personId, base64Data)
+    private void getPhotoRg(RequestBody body) {
+        networkApi.getPhotoRg(body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidScheduler.mainThread())
                 .subscribe(new SingleObserver<Result>() {

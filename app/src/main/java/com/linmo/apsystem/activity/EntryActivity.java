@@ -29,6 +29,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.linmo.apsystem.R;
 import com.linmo.apsystem.api.NetworkApi;
+import com.linmo.apsystem.model.RequestBody;
 import com.linmo.apsystem.model.Result;
 import com.linmo.apsystem.utils.AndroidScheduler;
 import com.linmo.apsystem.utils.BaseUtils;
@@ -55,6 +56,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.Body;
 
 public class EntryActivity extends AppCompatActivity {
     private static final String TAG = "EntryActivity";
@@ -110,11 +112,11 @@ public class EntryActivity extends AppCompatActivity {
     @OnClick(R.id.btn_rentry)
     void rentry(){
         System.out.println(base64Data);
-        getPhotoRg("202206", base64Data);
+        getPhotoRg(new RequestBody("202206", base64Data));
     }
 
-    private void upload(String personId, String base64Data){
-        networkApi.uploadRg(personId, base64Data)
+    private void upload(RequestBody body){
+        networkApi.uploadRg(body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidScheduler.mainThread())
                 .subscribe(new SingleObserver<Result>() {
@@ -135,8 +137,8 @@ public class EntryActivity extends AppCompatActivity {
                 });
     }
 
-    private void getPhotoRg(String personId, String base64Data) {
-        networkApi.getPhotoRg(personId, base64Data)
+    private void getPhotoRg(RequestBody body) {
+        networkApi.getPhotoRg(body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidScheduler.mainThread())
                 .subscribe(new SingleObserver<Result>() {
