@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.TextureView;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -64,6 +65,9 @@ public class EntryActivity extends AppCompatActivity {
     
     @BindView(R.id.entry_surfaceView)
     AutoFitTextureView textureView;
+
+    @BindView(R.id.et_personid)
+    EditText personId;
 
     private Camera2Helper helper;
     private Retrofit retrofit;
@@ -113,7 +117,18 @@ public class EntryActivity extends AppCompatActivity {
     @OnClick(R.id.btn_rentry)
     void rentry(){
         Log.d(TAG, "rentry: " + base64Data);
-        upload("202206", base64Data);
+        String id = personId.getText().toString();
+        if (id!=null && !id.equals("")){
+            upload(id, base64Data);
+        }
+    }
+
+    @OnClick(R.id.btn_train)
+    void train(){
+        String id = personId.getText().toString();
+        if (id!=null && !id.equals("")){
+            trainerRg(id);
+        }
     }
 
     private void upload(String personId, String imgdata){
@@ -138,8 +153,8 @@ public class EntryActivity extends AppCompatActivity {
                 });
     }
 
-    private void getPhotoRg(String personId, String imgdata) {
-        networkApi.getPhotoRg(personId, imgdata)
+    private void trainerRg(String personId) {
+        networkApi.trainerRg(personId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidScheduler.mainThread())
                 .subscribe(new SingleObserver<Result>() {
@@ -150,7 +165,7 @@ public class EntryActivity extends AppCompatActivity {
 
                     @Override
                     public void onSuccess(@NonNull Result result) {
-                        ToastUtils.show(EntryActivity.this, result.toString());
+                        ToastUtils.show(EntryActivity.this, result.getMsg());
                     }
 
                     @Override
