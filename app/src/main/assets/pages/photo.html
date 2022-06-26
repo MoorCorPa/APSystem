@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>调用本地摄像头使用HTML5 Canvas拍照并转为base64格式的图片</title>
+	<script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+    <script src="tracking-min.js"></script>
+    <script src="face-min.js"></script>
+    <style>
+        video, canvas {
+          margin-left: 230px;
+          margin-top: 120px;
+          position: absolute;
+        }
+        </style>
+</head>
+<body>
+
+	<input id="personId" name="personId" placeholder="请输入工号（例如：1001，不能与其他人的重合）">
+	<span style="color:red;">* 首次使用需要上传图片及训练模型</span>
+	
+	<br/>
+  
+    <video id="video" width="640" height="480" preload autoplay loop muted></video>
+    <canvas id="canvas" width="640" height="480"></canvas>
+    <!--<button id='control'>识别(使用opencv)</button>-->
+    <button id='btnupload_rg'>1.上传训练模型的照片(至少5张不同角度)</button><br/>
+    <button id='btntrainner_rg'>2.训练模型</button><br/>
+    <button id='btncontrol_rg'>3.识别(使用face_recognition开源项目)</button><br/>
+
+    <script>
+
+        var video = document.getElementById('video');
+        var audio, audioType;
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext('2d');
+
+        window.onload = function() {
+            video = document.getElementById('video');
+            canvas = document.getElementById('canvas');
+            context = canvas.getContext('2d');
+            navigator.getUserMedia = navigator.getUserMedia || navigator.mediaDevices.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.mediaDevices;
+            window.URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
+
+            if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
+                navigator.mediaDevices.getUserMedia({
+                    'audio':true,
+                    'video':{ 'facingMode': "user" }//调用前置摄像头，后置摄像头使用video: { facingMode: { exact: "environment" } }
+                })
+                .then(function(mediaStream) {console.log(555);getVideoStream(mediaStream)})
+                .catch(function(error) { console.log(666);console.log(error) })
+            }else if(navigator.getUserMedia){
+                navigator.getUserMedia({
+                    'video':true,
+                    'audio':true
+                },getVideoStream,getFail)
+            }else{
+                alert('不支持摄像头调用！')
+            }
+
+            var tracker = new tracking.ObjectTracker('face');
+            tracker.setInitialScale(4);
+            tracker.setStepSize(2);
+            tracker.setEdgesDensity(0.1);
+      
+            tracking.track('#video', tracker, { camera: true });
+      
+            tracker.on('track', function(event) {
+              context.clearRect(0, 0, canvas.width, canvas.height);
+      
+              event.data.forEach(function(rect) {
+                context.strokeStyle = '#a64ceb';
+                context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+                context.font = '11px Helvetica';
+                context.fillStyle = "#fff";
+                context.fillText('x: ' + rect.x + 'px', rect.x + rect.width + 5, rect.y + 11);
+                context.fillText('y: ' + rect.y + 'px', rect.x + rect.width + 5, rect.y + 22);
+              });
+            });
+
+            //control.addEventListener('click',function(){  
+                //getPhoto()
+            //})
+            btnupload_rg.addEventListener('click',function(){  
+                upload_rg()
+            })
+            btntrainner_rg.addEventListener('click',function(){  
+                trainer_rg()
+            })
+            btncontrol_rg.addEventListener('click',function(){  
+                getPhoto_rg()
+            })
+      
+          };
+
+           //拍照
+        function getPhoto() {
+
+            context.drawImage(video, 0, 0, 640 ,480); //将video对象内指定的区域捕捉绘制到画布上指定的区域，实现拍照。
+            // var new_img = document.createElement('img');
+            // new_img.setAttribute('crossOrigin', 'anonymous');
+            // new_img.src = canvas.toDataURL("image/jpeg");//图片转为base64格式
+            // new_img.setAttribute('width',300)
+            // new_img.setAttribute('height',300)
+            // console.log(canvas.toDataURL("image/jpeg"))
+            // document.body.appendChild(new_img)
+			
+			
+			var imgData = canvas.toDataURL("image/jpeg"); //将图像转换为base64数据              
+			var base64Data = imgData.substr(22); //在前端截取22位之后的字符串作为图像数据 
+			
+			
+			$.ajax('http://10.0.0.229:5001/face/facedetbase64', {
+			            method: 'POST',
+			            data: {
+							personId: '1002', 
+							imgdata: base64Data
+							},
+			            success:function (result) {
+			                console.log(result);
+			            },
+			            error:function (err) {
+			                console.log(err);
+			            }
+			        });
+        }
+	
+    //训练模型照片上传
+ function upload_rg() {
+
+    context.drawImage(video, 0, 0, 640 ,480); //将video对象内指定的区域捕捉绘制到画布上指定的区域，实现拍照。
+    // var new_img = document.createElement('img');
+    // new_img.setAttribute('crossOrigin', 'anonymous');
+    // new_img.src = canvas.toDataURL("image/jpeg");//图片转为base64格式
+    // new_img.setAttribute('width',300)
+    // new_img.setAttribute('height',300)
+    // console.log(canvas.toDataURL("image/jpeg"))
+    // document.body.appendChild(new_img)
+    var pId = personId.value;
+	if(pId == ""){
+		alert("请输入工号（例如：1001，不能与其他人的重合）")
+		return;
+	}
+	
+    
+    var imgData = canvas.toDataURL("image/jpeg"); //将图像转换为base64数据              
+    var base64Data = imgData.substr(22); //在前端截取22位之后的字符串作为图像数据 
+    
+    
+    $.ajax('http://10.0.0.229:5001/face/upload_rg', {
+                method: 'POST',
+                data: {
+                    personId: pId, 
+                    imgdata: base64Data
+                    },
+                success:function (result) {
+                    console.log(result);
+                },
+                error:function (err) {
+                    console.log(err);
+                }
+            });
+}
+
+ //训练模型
+ function trainer_rg() {
+
+    //context.drawImage(video, 0, 0, 640 ,480); //将video对象内指定的区域捕捉绘制到画布上指定的区域，实现拍照。
+    // var new_img = document.createElement('img');
+    // new_img.setAttribute('crossOrigin', 'anonymous');
+    // new_img.src = canvas.toDataURL("image/jpeg");//图片转为base64格式
+    // new_img.setAttribute('width',300)
+    // new_img.setAttribute('height',300)
+    // console.log(canvas.toDataURL("image/jpeg"))
+    // document.body.appendChild(new_img)
+    
+    
+    //var imgData = canvas.toDataURL("image/jpeg"); //将图像转换为base64数据              
+    //var base64Data = imgData.substr(22); //在前端截取22位之后的字符串作为图像数据 
+    var pId = personId.value;
+    
+    $.ajax('http://10.0.0.229:5001/face/trainer_rg', {
+                method: 'POST',
+                data: {
+                    personId: pId
+                    },
+                success:function (result) {
+                    console.log(result);
+                },
+                error:function (err) {
+                    console.log(err);
+                }
+            });
+}
+      
+ //识别
+ function getPhoto_rg() {
+
+    context.drawImage(video, 0, 0, 640 ,480); //将video对象内指定的区域捕捉绘制到画布上指定的区域，实现拍照。
+    // var new_img = document.createElement('img');
+    // new_img.setAttribute('crossOrigin', 'anonymous');
+    // new_img.src = canvas.toDataURL("image/jpeg");//图片转为base64格式
+    // new_img.setAttribute('width',300)
+    // new_img.setAttribute('height',300)
+    // console.log(canvas.toDataURL("image/jpeg"))
+    // document.body.appendChild(new_img)
+    
+    
+    var imgData = canvas.toDataURL("image/jpeg"); //将图像转换为base64数据              
+    var base64Data = imgData.substr(22); //在前端截取22位之后的字符串作为图像数据 
+    var pId = personId.value;
+    
+    $.ajax('http://10.0.0.229:5001/face/facerecognition', {
+                method: 'POST',
+                data: {
+                    personId: pId, 
+                    imgdata: base64Data
+                    },
+                success:function (result) {
+                    console.log(result);
+                },
+                error:function (err) {
+                    console.log(err);
+                }
+            });
+}
+
+
+
+
+       
+</script>
+</body>
+</html>
