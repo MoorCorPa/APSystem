@@ -113,11 +113,11 @@ public class SignActivity extends AppCompatActivity {
                     public void onSuccess(@NonNull Result result) {
                         Log.d(TAG, "onSuccess: " + result.toString());
 
-                        if ( result.getFace_distances() <= 0.38){
+                        if(result.getFace_distances() == 0.00){
+                            ToastUtils.show(SignActivity.this, "签到失败,未识别到照片");
+                        }else if ( result.getFace_distances() <= 0.38){
                             ToastUtils.show(SignActivity.this, "签到成功");
                         }
-
-                        ToastUtils.show(SignActivity.this, "签到失败,精度为：" + result.getFace_distances()+"");
                     }
 
                     @Override
