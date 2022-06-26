@@ -1,6 +1,10 @@
 package com.linmo.apsystem.activity;
 
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.ImageFormat;
+import android.media.Image;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -8,6 +12,7 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
@@ -17,6 +22,9 @@ import com.linmo.apsystem.model.RequestBody;
 import com.linmo.apsystem.model.Result;
 import com.linmo.apsystem.utils.AndroidScheduler;
 import com.linmo.apsystem.utils.BaseUtils;
+import com.linmo.apsystem.utils.Camera2Helper;
+import com.linmo.apsystem.utils.ToastUtils;
+import com.linmo.apsystem.view.AutoFitTextureView;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -30,23 +38,33 @@ import io.reactivex.rxjava3.core.SingleObserver;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SignActivity extends AppCompatActivity {
     private static final String TAG = null;
 
     // 获取控件
+    // 拍照签到
     @BindView(R.id.sign)
     Button sing;
+    // 输入框
     @BindView(R.id.et_personid)
     EditText et_personid;
-
+    // 视频框
+    @BindView(R.id.entry_surfaceView)
+    AutoFitTextureView textureView;
+    // 回到上一个页面
+    @BindView(R.id.back)
     Button back;
 
-
-    private Retrofit retrofit;
     private SharedPreferences address;
     private NetworkApi networkApi;
+    private Camera2Helper helper;
+    private String base64Data;
+    private Retrofit retrofit;
     private Gson gson;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +73,8 @@ public class SignActivity extends AppCompatActivity {
 
         // 绑定处理
         ButterKnife.bind(this);
+        // 实时监控
+        init();
     }
 
     //点击签到
@@ -65,10 +85,11 @@ public class SignActivity extends AppCompatActivity {
         signid = et_personid.getText().toString();
         Log.d(TAG, "SignIn: "+ signid);
 
-
         // 网络请求
-//        getPhotoRg(signid,);
+        getPhotoRg(signid,base64Data);
     }
+
+
 
     // 回到上一个页面
     @OnClick(R.id.back)
@@ -76,7 +97,7 @@ public class SignActivity extends AppCompatActivity {
         finish();
     }
 
-    // 网络请求
+    // 网络请求（识别图片）
     private void getPhotoRg(String personId, String imgdata) {
         networkApi.getPhotoRg(personId, imgdata)
                 .subscribeOn(Schedulers.io())
@@ -100,39 +121,52 @@ public class SignActivity extends AppCompatActivity {
     }
 
 
+    private void init(){
+        helper = new Camera2Helper(this, textureView);
+        helper.setImageFormat(ImageFormat.JPEG);
+        address = getSharedPreferences("address", MODE_PRIVATE);
+        String url = address.getString("address", "http://10.0.0.229:5001/"); //http://10.0.2.2:5001/ http://10.0.0.229:5001/
+        gson = new Gson();
+        retrofit = new Retrofit.Builder()
+                .baseUrl(url)
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
 
+        networkApi = retrofit.create(NetworkApi.class);
 
-    /**
-     * 将图片转换成Base64编码的字符串
-     */
-    public static String imageToBase64(String path){
-        if(TextUtils.isEmpty(path)){
-            return null;
-        }
-        InputStream is = null;
-        byte[] data = null;
-        String result = null;
-        try{
-            is = new FileInputStream(path);
-            //创建一个字符流大小的数组。
-            data = new byte[is.available()];
-            //写入数组
-            is.read(data);
-            //用默认的编码格式进行编码
-            result = Base64.encodeToString(data,Base64.NO_CLOSE);
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
-            if(null !=is){
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        helper.setOnImageAvailableListener(new Camera2Helper.OnPreviewCallbackListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onImageAvailable(Image image) {
+                Log.d(TAG, "helper onImageAvailable");
+                base64Data = BaseUtils.image2base64(image);
             }
-
-        }
-        return result;
+        });
     }
 
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        helper.open();  //会动态请求权限，请重写 onRequestPermissionsResult
+    }
+
+    @Override
+    public void onPause() {
+        helper.closeCamera();
+        super.onPause();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        if (requestCode == helper.getCameraRequestCode()) {
+            if (grantResults.length != 1 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                ToastUtils.show(this,  "我号了");
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
 }
