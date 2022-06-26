@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.linmo.apsystem.activity.SettingActivity;
 import com.linmo.apsystem.activity.SignActivity;
 import com.linmo.apsystem.activity.EntryActivity;
 
@@ -39,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
 //        webView.loadUrl("file:///android_asset/pages/photo.html");
     }
 
-    @OnClick({R.id.btn_in, R.id.btn_entry})
+    @OnClick({R.id.btn_in, R.id.btn_entry, R.id.btn_setting})
     public void onClick(View v){
         switch (v.getId()){
             case R.id.btn_entry:
@@ -49,6 +50,10 @@ public class MainActivity extends AppCompatActivity {
             case R.id.btn_in:
                 startActivity(new Intent(this, SignActivity.class));
                 Log.d("signIn", "onClick: signIn");
+                break;
+            case R.id.btn_setting:
+                startActivity(new Intent(this, SettingActivity.class));
+                Log.d("signIn", "onClick: setting");
                 break;
         }
     }

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.widget.EditText;
 
 import com.linmo.apsystem.R;
+import com.linmo.apsystem.utils.ToastUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,5 +31,6 @@ public class SettingActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("address", "http://"+address.getText().toString()+"/");
         editor.commit();
+        ToastUtils.show(this, "保存成功，IP 地址为：" + preferences.getString("address", ""));
     }
 }
