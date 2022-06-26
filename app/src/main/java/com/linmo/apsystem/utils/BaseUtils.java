@@ -8,11 +8,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Camera;
 import android.graphics.ImageFormat;
+import android.graphics.Matrix;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
 import android.media.Image;
 import android.os.Build;
 import android.os.MemoryFile;
+import android.util.Base64;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
@@ -27,7 +29,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.Base64;
 
 public class BaseUtils {
 
@@ -41,8 +42,7 @@ public class BaseUtils {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public static String byte2Base64(byte[] src) {
-        Base64.Encoder encoder = Base64.getEncoder();
-        return encoder.encodeToString(src);
+        return Base64.encodeToString(src, Base64.DEFAULT);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -83,11 +83,41 @@ public class BaseUtils {
     }
 
     public static byte[] bitmap2Byte(Bitmap bitmap) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        //把bitmap100%高质量压缩 到 output对象里
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-        return outputStream.toByteArray();
+        bitmap = adjustPhotoRotation(bitmap, -90);
+        byte[] result = null;
+        ByteArrayOutputStream outputStream = null;
+        try {
+            outputStream = new ByteArrayOutputStream();
+            //把bitmap100%高质量压缩 到 output对象里
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            result = outputStream.toByteArray();
+        } finally {
+            try {
+                if (outputStream != null) {
+                    outputStream.flush();
+                    outputStream.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
     }
 
+    public static Bitmap adjustPhotoRotation(Bitmap bm, final int orientationDegree) {
+
+        Matrix m = new Matrix();
+        m.setRotate(orientationDegree, (float) bm.getWidth() / 2, (float) bm.getHeight() / 2);
+
+        try {
+            Bitmap bm1 = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), m, true);
+
+            return bm1;
+
+        } catch (OutOfMemoryError ex) {
+        }
+        return null;
+
+    }
 
 }

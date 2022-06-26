@@ -23,8 +23,8 @@ import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
-    @BindView(R.id.wv_main)
-    WebView webView;
+//    @BindView(R.id.wv_main)
+//    WebView webView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,9 +34,9 @@ public class MainActivity extends AppCompatActivity {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)//判断是否获得权限
         {  ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 100);}//获取权限
 
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.setWebViewClient(new WebViewClient());
-        webView.loadUrl("file:///android_asset/pages/photo.html");
+//        webView.getSettings().setJavaScriptEnabled(true);
+//        webView.setWebViewClient(new WebViewClient());
+//        webView.loadUrl("file:///android_asset/pages/photo.html");
     }
 
     @OnClick({R.id.btn_in, R.id.btn_entry})

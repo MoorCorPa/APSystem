@@ -57,6 +57,7 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
+import retrofit2.http.Field;
 
 public class EntryActivity extends AppCompatActivity {
     private static final String TAG = "EntryActivity";
@@ -86,7 +87,7 @@ public class EntryActivity extends AppCompatActivity {
         helper = new Camera2Helper(this, textureView);
         helper.setImageFormat(ImageFormat.JPEG);
         address = getSharedPreferences("address", MODE_PRIVATE);
-        String url = address.getString("address", "http://10.0.0.229:5001/");
+        String url = address.getString("address", "http://10.0.0.229:5001/"); //http://10.0.2.2:5001/ http://10.0.0.229:5001/
         gson = new Gson();
         retrofit = new Retrofit.Builder()
                 .baseUrl(url)
@@ -111,12 +112,12 @@ public class EntryActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.O)
     @OnClick(R.id.btn_rentry)
     void rentry(){
-        System.out.println(base64Data);
-        getPhotoRg(new RequestBody("202206", base64Data));
+        Log.d(TAG, "rentry: " + base64Data);
+        upload("202206", base64Data);
     }
 
-    private void upload(RequestBody body){
-        networkApi.uploadRg(body)
+    private void upload(String personId, String imgdata){
+        networkApi.uploadRg(personId, imgdata)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidScheduler.mainThread())
                 .subscribe(new SingleObserver<Result>() {
@@ -127,18 +128,18 @@ public class EntryActivity extends AppCompatActivity {
 
                     @Override
                     public void onSuccess(@NonNull Result result) {
-                        Log.d(TAG, "onSuccess: " + result.toString());
+                        ToastUtils.show(EntryActivity.this, result.toString());
                     }
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        Log.d(TAG, "onError: " + e.getMessage());
+                        ToastUtils.show(EntryActivity.this, e.getMessage());
                     }
                 });
     }
 
-    private void getPhotoRg(RequestBody body) {
-        networkApi.getPhotoRg(body)
+    private void getPhotoRg(String personId, String imgdata) {
+        networkApi.getPhotoRg(personId, imgdata)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidScheduler.mainThread())
                 .subscribe(new SingleObserver<Result>() {
@@ -149,12 +150,12 @@ public class EntryActivity extends AppCompatActivity {
 
                     @Override
                     public void onSuccess(@NonNull Result result) {
-                        Log.d(TAG, "onSuccess: " + result.toString());
+                        ToastUtils.show(EntryActivity.this, result.toString());
                     }
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        Log.d(TAG, "onError: " + e.getMessage());
+                        ToastUtils.show(EntryActivity.this, e.getMessage());
                     }
                 });
     }

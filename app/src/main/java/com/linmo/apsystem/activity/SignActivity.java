@@ -77,8 +77,8 @@ public class SignActivity extends AppCompatActivity {
     }
 
     // 网络请求
-    private void getPhotoRg(RequestBody body) {
-        networkApi.getPhotoRg(body)
+    private void getPhotoRg(String personId, String imgdata) {
+        networkApi.getPhotoRg(personId, imgdata)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidScheduler.mainThread())
                 .subscribe(new SingleObserver<Result>() {

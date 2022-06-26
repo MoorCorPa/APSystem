@@ -3,14 +3,16 @@ package com.linmo.apsystem.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import retrofit2.http.Body;
 
 @Data
+@ToString
 public class RequestBody {
-    String personId, base64Data;
+    String personId, imgdata;
 
-    public RequestBody(String personId, String base64Data) {
+    public RequestBody(String personId, String imgdata) {
         this.personId = personId;
-        this.base64Data = base64Data;
+        this.imgdata = imgdata;
     }
 }
