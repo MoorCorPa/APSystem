@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.TextureView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -68,6 +69,9 @@ public class EntryActivity extends AppCompatActivity {
 
     @BindView(R.id.et_personid)
     EditText personId;
+
+    @BindView(R.id.btn_train)
+    Button btn_train;
 
     private Camera2Helper helper;
     private Retrofit retrofit;
@@ -126,9 +130,17 @@ public class EntryActivity extends AppCompatActivity {
     @OnClick(R.id.btn_train)
     void train(){
         String id = personId.getText().toString();
-        if (id!=null && !id.equals("")){
-            trainerRg(id);
+        try {
+            if (id!=null && !id.equals("")){
+                btn_train.setEnabled(false);
+                trainerRg(id);
+                Thread.sleep(3000);
+                btn_train.setEnabled(true);
+            }
+        }catch (InterruptedException e){
+            e.printStackTrace();
         }
+
     }
 
     private void upload(String personId, String imgdata){
@@ -143,7 +155,7 @@ public class EntryActivity extends AppCompatActivity {
 
                     @Override
                     public void onSuccess(@NonNull Result result) {
-                        ToastUtils.show(EntryActivity.this, result.toString());
+                        ToastUtils.show(EntryActivity.this, result.getMsg());
                     }
 
                     @Override

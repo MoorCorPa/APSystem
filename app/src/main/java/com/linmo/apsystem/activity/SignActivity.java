@@ -91,6 +91,7 @@ public class SignActivity extends AppCompatActivity {
 
 
 
+
     // 回到上一个页面
     @OnClick(R.id.back)
     public void onViewClicked() {
@@ -111,11 +112,18 @@ public class SignActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(@NonNull Result result) {
                         Log.d(TAG, "onSuccess: " + result.toString());
+
+                        if ( result.getFace_distances() <= 0.38){
+                            ToastUtils.show(SignActivity.this, "签到成功");
+                        }
+
+                        ToastUtils.show(SignActivity.this, "签到失败,精度为：" + result.getFace_distances()+"");
                     }
 
                     @Override
                     public void onError(@NonNull Throwable e) {
                         Log.d(TAG, "onError: " + e.getMessage());
+                        ToastUtils.show(SignActivity.this, e.getMessage());
                     }
                 });
     }
